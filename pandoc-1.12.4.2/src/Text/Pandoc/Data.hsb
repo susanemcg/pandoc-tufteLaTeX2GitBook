@@ -1,0 +1,7 @@
+{-# LANGUAGE OverloadedStrings #-}
+-- to be processed using hsb2hs
+module Text.Pandoc.Data (dataFiles) where
+import qualified Data.ByteString as B
+
+dataFiles :: [(FilePath, B.ByteString)]
+dataFiles = %blobs "data"

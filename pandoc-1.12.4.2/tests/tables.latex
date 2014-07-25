@@ -1,0 +1,169 @@
+Simple table with caption:
+
+\begin{longtable}[c]{@{}rlcl@{}}
+\toprule\addlinespace
+Right & Left & Center & Default
+\\\addlinespace
+\midrule\endhead
+12 & 12 & 12 & 12
+\\\addlinespace
+123 & 123 & 123 & 123
+\\\addlinespace
+1 & 1 & 1 & 1
+\\\addlinespace
+\bottomrule
+\addlinespace
+\caption{Demonstration of simple table syntax.}
+\end{longtable}
+
+Simple table without caption:
+
+\begin{longtable}[c]{@{}rlcl@{}}
+\toprule\addlinespace
+Right & Left & Center & Default
+\\\addlinespace
+\midrule\endhead
+12 & 12 & 12 & 12
+\\\addlinespace
+123 & 123 & 123 & 123
+\\\addlinespace
+1 & 1 & 1 & 1
+\\\addlinespace
+\bottomrule
+\end{longtable}
+
+Simple table indented two spaces:
+
+\begin{longtable}[c]{@{}rlcl@{}}
+\toprule\addlinespace
+Right & Left & Center & Default
+\\\addlinespace
+\midrule\endhead
+12 & 12 & 12 & 12
+\\\addlinespace
+123 & 123 & 123 & 123
+\\\addlinespace
+1 & 1 & 1 & 1
+\\\addlinespace
+\bottomrule
+\addlinespace
+\caption{Demonstration of simple table syntax.}
+\end{longtable}
+
+Multiline table with caption:
+
+\begin{longtable}[c]{@{}clrl@{}}
+\toprule\addlinespace
+\begin{minipage}[b]{0.13\columnwidth}\centering
+Centered Header
+\end{minipage} & \begin{minipage}[b]{0.12\columnwidth}\raggedright
+Left Aligned
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedleft
+Right Aligned
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Default aligned
+\end{minipage}
+\\\addlinespace
+\midrule\endhead
+\begin{minipage}[t]{0.13\columnwidth}\centering
+First
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+row
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedleft
+12.0
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Example of a row that spans multiple lines.
+\end{minipage}
+\\\addlinespace
+\begin{minipage}[t]{0.13\columnwidth}\centering
+Second
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+row
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedleft
+5.0
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Here's another one. Note the blank line between rows.
+\end{minipage}
+\\\addlinespace
+\bottomrule
+\addlinespace
+\caption{Here's the caption. It may span multiple lines.}
+\end{longtable}
+
+Multiline table without caption:
+
+\begin{longtable}[c]{@{}clrl@{}}
+\toprule\addlinespace
+\begin{minipage}[b]{0.13\columnwidth}\centering
+Centered Header
+\end{minipage} & \begin{minipage}[b]{0.12\columnwidth}\raggedright
+Left Aligned
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedleft
+Right Aligned
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Default aligned
+\end{minipage}
+\\\addlinespace
+\midrule\endhead
+\begin{minipage}[t]{0.13\columnwidth}\centering
+First
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+row
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedleft
+12.0
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Example of a row that spans multiple lines.
+\end{minipage}
+\\\addlinespace
+\begin{minipage}[t]{0.13\columnwidth}\centering
+Second
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+row
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedleft
+5.0
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Here's another one. Note the blank line between rows.
+\end{minipage}
+\\\addlinespace
+\bottomrule
+\end{longtable}
+
+Table without column headers:
+
+\begin{longtable}[c]{@{}rlcr@{}}
+\toprule\addlinespace
+12 & 12 & 12 & 12
+\\\addlinespace
+123 & 123 & 123 & 123
+\\\addlinespace
+1 & 1 & 1 & 1
+\\\addlinespace
+\bottomrule
+\end{longtable}
+
+Multiline table without column headers:
+
+\begin{longtable}[c]{@{}clrl@{}}
+\toprule\addlinespace
+\begin{minipage}[t]{0.13\columnwidth}\centering
+First
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+row
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedleft
+12.0
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Example of a row that spans multiple lines.
+\end{minipage}
+\\\addlinespace
+\begin{minipage}[t]{0.13\columnwidth}\centering
+Second
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+row
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedleft
+5.0
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Here's another one. Note the blank line between rows.
+\end{minipage}
+\\\addlinespace
+\bottomrule
+\end{longtable}
