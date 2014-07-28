@@ -9,7 +9,7 @@ To streamline the publication of papers and short books across multiple formats,
 
 ##### Background
 
-I wrote a paper and formatted the print version as a PDF using the tufte-LaTeX book class, which allows citations and notes to float in the margin of the page. The resulting PDF can be used to update the print version, but the online version - published via GitBook - requires markdown. The tremendous [pandoc](https://github.com/jgm/pandoc), allows automatic conversion between LaTeX and markdown, but did not properly handle the tufte-LaTeX `sidenote` and `marginnote` elements, eliminating them from the resulting markdown. Similarly, in tufte-LaTeX the `footnote` element has optional numbering and positioning arguments, but footnotes that used these were also ignored. Though a combination of pandoc transformations and regular expressions could get the job done, I wanted a more elegant and (sort of) reliable solution.
+I wrote a paper and formatted the print version as a PDF using the tufte-LaTeX book class, which allows citations and notes to float in the margin of the page. The resulting PDF can be used to update the print version, but the online version - published via GitBook - requires markdown. The tremendous [pandoc](https://github.com/jgm/pandoc) allows automatic conversion between LaTeX and markdown, but did not properly handle the tufte-LaTeX `sidenote` and `marginnote` elements, eliminating them from the resulting output. Similarly, in tufte-LaTeX the `footnote` element has optional numbering and positioning arguments, but footnotes that used these in the original document were also ignored in the markdown version. Though a combination of pandoc transformations and regular expressions could get the job done, I wanted a more elegant and (sort of) reliable solution.
 
 And because hacking some Haskell sounded like fun.
 
@@ -56,6 +56,69 @@ There are two basic steps you need to complete before you can run pandoc from th
   
   + To actually **do** this, go back to terminal and type `open ~/.bash_profile` and hit enter. If the file doesn't exist, try `touch .bash_profile` (this will create the file). Don't worry if the file is empty, just add the line above to the file, save and then close it. Then in terminal run `source .bash_profile`, which will force your system to recognize the changes (there is a helpful how-to on these steps on [StackOverflow](https://superuser.com/questions/409501/edit-bash-profile-in-os-x))
 3. Test it out! In terminal, type `pandoc --help` and hit return. If a whole bunch of instructions appear, you're up and running!
+
+##### The modifications
+
+###### Modifying `pandoc-types`
+
+The document elements that pandoc recognizes are enumerated and described (primarily) in two files found in `pandoc-types -> Text -> Pandoc`: `Definition.hs` and `Builder.hs`. Modifying these is fairly straightforward (though my implementation is not exhaustive - hence why this repo is *not* currently a fork). I needed pandoc to be able recognize `marginnote` and `sidenote` as legitimate LaTeX tags, and so inserted them by following the pattern used for other inline text elements like emphasis and super/sub scripting tags. This means they will be part of the intermediate document tree than pandoc creates when moving from LaTeX to another format. (These changes can be compiled into the executable code using the same `cabal install --force-reinstalls` command noted above)
+
+###### Modifying `pandoc`
+
+Once the types have been modified and recompiled, the next step is to modify the appropriate "reader" and "writer" files so that pandoc knows what to do with the new elements. Because I was centrally concerned with the LaTeX -> markdown transformation, I worked with the LaTeX reader and the markdown writer.
+
+  1. Open the appropriate "reader" file in `pandoc -> src -> Text -> Pandoc -> Readers`, in this case, `LaTeX.hs`.
+  2. Add your new elements to the appropriate `-Commands` function. Because I added "inline" elements, mine were added to `inlineCommands`.
+  3. As I had no prior experience with either the pandoc codebase or Haskell, working out how to produce the tags I was looking for took a fair amount of trial and error. Eventually, however, I worked out the following:
+    + In the line `("marginnote", skipopts *> (marginnote <$> tok))`, the "marginnote" needs to match the name of the element that will appear in the LaTeX source file. This also needs to match the element/tag added to `Builder.hs` in `pandoc-types`. The description *of* that element in `Builder.hs`, however, needs to match the format that was added to `Definition.hs` in that same library. In this case, that was `MarginNote`.
+    + The function `skipopts` already existed to skip bracketed options on other LaTeX elements. The `*>` and `<$> tok` arguments were determined by trial-and-error after reviewing how some similar tags were handled. A similar process followed for modifying the `footnote` element, which was handled properly except that those with leading bracketed options were ignored. In that case, just adding the `skipopts *>` call and closing the parens properly was sufficient.
+  4. Open the appropriate "writer" file in `pandoc -> src -> Text -> Pandoc -> Writers`, in this case, `Markdown.hs`.
+  5. Describe how the new elements should be converted expressed/formatted in markdown by adding them to the appropriate `-ToMarkdown` function, in this case `inlineToMarkdown`. I decided to render `sidenote` and `marginnote` elements as block quotes, which meant surrounding them with blank lines (pandoc already had a handy `blankline` method for that) and preceding the actual text with a `>` character. The general pattern of the resulting code was modifying from other inline elements (note that `MarginNote` matches the type definition we created in `Definition.hs` within `pandoc-types`):
+
+      inlineToMarkdown opts (MarginNote lst) = do
+      contents <- inlineListToMarkdown opts lst
+      return $ blankline <> " > " <> contents <> "" <> blankline  
+  
+  6. Once all the changes are made, recompile the pandoc with the `cabal install` command used above. Note that this will both take a while and that the compiler will yell at you for not making the new elements that you've made "readable" via the `LaTeX.hs` reader also "writable" by all types (not just markdown). So unless/until you modify all the available writers to handle your new elements, you will many warnings like this when you compile, but it will still work for the reader/writer combination that you *have* modified properly:
+
+      src/Text/Pandoc/Writers/AsciiDoc.hs:325:1: Warning:
+      Pattern match(es) are non-exhaustive
+      In an equation for `inlineToAsciiDoc':
+        Patterns not matched:
+            _ (MarginNote _)
+            _ (SideNote _)
+
+###### Creating the filter
+
+The modifications to `pandoc` and `pandoc-types` handled the most essential issues, i.e. making sure that no content was lost in the document conversion process. But I was not entirely happy with the inline treatment of the footnotes: while they were formatted as a nice list of links at the end of the markdown file, the inline citations were plaintext, of the format `[^3]` for example. Not linked, not superscripted. Given the format of my GitBook, I wanted to make all inline footnote citations render as superscripted numerals that link to a specified html file (when I port the markdown to GitBook, it means breaking up the generated markdown into multiple files).
+
+Of course I could (and at first did) hack this by hard-coding the html (including the filename) into the footnote handling method of the `Markdown.hs` writer. Turns out I could only live with that for about 5 hours, and after hunting around a bit determined that my best option was to write a filter in Python that would transform all `Note` elements from the pandoc document tree and render them as inline html.
+
+Since there are a number of examples in the repo and I'm pretty familiar with Python, the trickiest part of this was identifying the correct data type both to search for (i.e. `Note`) and to output to the markdown file (filters work on the intermediate pandoc document tree). Doing this very robustly would have required a much more intimate understand of both pandoc and Haskell that I have or am willing to acquire in the near future, so I settled for writing `RawInline` html. 
+
+This was sufficient to add the required `<sup></sup>` tags without their being subsequently escaped in the translation to markdown (which was the result when I tried to use the `Str` type). For the actual number, I borrowed a trick from the `theorem.py` example, and simply created a global variable. Finally, I learned that metadata arguments passed the the `pandoc` command are accessible to filters via the `meta` parameter, and so used that to pass in the name of the file to which I wanted all of my footnotes to link. Though I am sure there is a more elegant way to pull the necessary info from the unicode parameter, I also wasn't ready to invest the time to locate it for this example, hence the `meta['footnote_file']['c']`.
+
+In order to actually *use* your filter, you'll need to do the following:
+
+1. Make it executable by running `chmod +x your_new_filter.py` 
+2. Assuming you've place it within the `pandocfilters -> examples` folder, you'll also need to re-run the `python setup.py install` command.
+3. Finally, you need to add that examples folder to your `PATH` by once again editing your `~/. bash_profile` file (don't forget to run `source ~/.bash_profile` afterwards!). So, for example, I added the line:
+
+  `export PATH="$HOME/Desktop/Projects/pandoc/pandoc-tufteLaTeX2GitBook/pandocfilters-1.2.1/examples/:$PATH"`
+
+
+##### Using the modified version of pandoc with your filter
+
+If everything is working correctly, you should be able to run both pandoc and your new filter(s) on any file within your current user (e.g. on this same login). The final command for running the pandoc conversion with the `footnote_file` metadata parameter and filter is:
+
+`pandoc YourTexFile.tex -f latex -t markdown -o YourMarkdownFile.md -M footnote_file=footnotes/README.html --filter external_footnotes.py`
+
+And that's it! 
+
+
+
+
+
 
 
 
