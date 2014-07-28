@@ -5,11 +5,11 @@ A modified version of the pandoc program that handles the sidenotes, marginnotes
 
 ##### Why build this?
 
-To streamline the publication of papers and short books across multiple formats, specifically PDF/print to versionable text with GitBook.
+To streamline the publication of papers and short books across multiple formats, specifically PDF/print to versionable text with GitBook. Specifically, the LaTeX that generates [this print book](http://www.lulu.com/shop/susan-mcgregor/digital-security-and-source-protection-for-journalists/paperback/product-21720537.html) into the markdown that generated [this GitBook](https://www.gitbook.io/book/susanemcg/digital-security-for-journalists).
 
 ##### Background
 
-I wrote a paper and formatted the print version as a PDF using the tufte-LaTeX book class, which allows citations and notes to float in the margin of the page. The resulting PDF can be used to update the print version, but the online version - published via GitBook - requires markdown. The tremendous [pandoc](https://github.com/jgm/pandoc) allows automatic conversion between LaTeX and markdown, but did not properly handle the tufte-LaTeX `sidenote` and `marginnote` elements, eliminating them from the resulting output. Similarly, in tufte-LaTeX the `footnote` element has optional numbering and positioning arguments, but footnotes that used these in the original document were also ignored in the markdown version. Though a combination of pandoc transformations and regular expressions could get the job done, I wanted a more elegant and (sort of) reliable solution.
+I recently wrote a paper ([Digital Security and Source Protection for Journalists](http://towcenter.org/digital-security-and-source-protection-for-journalists/)), and formatted the print version as a PDF using the tufte-LaTeX book class, which allows citations and notes to float in the margin of the page. The resulting PDF can be used to update the print version, but the online version - published via GitBook - requires markdown. The tremendous [pandoc](https://github.com/jgm/pandoc) allows automatic conversion between LaTeX and markdown, but did not properly handle the tufte-LaTeX `sidenote` and `marginnote` elements, eliminating them from the resulting output. Similarly, in tufte-LaTeX the `footnote` element has optional numbering and positioning arguments, but footnotes that used these in the original document were also ignored in the markdown version. Though a combination of pandoc transformations and regular expressions could get the job done, I wanted a more elegant and (sort of) reliable solution.
 
 And because hacking some Haskell sounded like fun.
 
