@@ -113,7 +113,7 @@ If everything is working correctly, you should be able to run both pandoc and yo
 
 `pandoc YourTexFile.tex -f latex -t markdown -o YourMarkdownFile.md -M footnote_file=footnotes/README.html --filter external_footnotes.py`
 
-And that's it! 
+> Note that using the filter currently eliminates the default footnote list at the bottom of the markdown file, which means running the above once without the filter (and extracting the footnote markdown to your external file) and then again with the filter to get the correct formatting/linking for the footnotes.
 
 
 
