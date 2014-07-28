@@ -224,6 +224,8 @@ data MathType = DisplayMath | InlineMath deriving (Show, Eq, Ord, Read, Typeable
 data Inline
     = Str String            -- ^ Text (string)
     | Emph [Inline]         -- ^ Emphasized text (list of inlines)
+    | MarginNote [Inline]   -- ^ MarginNote acts as an unnumbered aside in tufte-LaTeX
+    | SideNote [Inline]     -- ^ SideNotes are factored into footnote numbering in tufte-LaTeX
     | Strong [Inline]       -- ^ Strongly emphasized text (list of inlines)
     | Strikeout [Inline]    -- ^ Strikeout text (list of inlines)
     | Superscript [Inline]  -- ^ Superscripted text (list of inlines)

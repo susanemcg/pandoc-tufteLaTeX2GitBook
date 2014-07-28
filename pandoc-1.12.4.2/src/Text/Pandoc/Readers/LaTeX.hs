@@ -397,6 +397,8 @@ isBlockCommand s = maybe False (const True) $ M.lookup s blockCommands
 inlineCommands :: M.Map String (LP Inlines)
 inlineCommands = M.fromList $
   [ ("emph", emph <$> tok)
+  , ("marginnote", skipopts *> (marginnote <$> tok))
+  , ("sidenote", skipopts *> (sidenote <$> tok))  
   , ("textit", emph <$> tok)
   , ("textsl", emph <$> tok)
   , ("textsc", smallcaps <$> tok)
@@ -475,7 +477,7 @@ inlineCommands = M.fromList $
   , ("textless", lit "<")
   , ("textgreater", lit ">")
   , ("thanks", (note . mconcat) <$> (char '{' *> manyTill block (char '}')))
-  , ("footnote", (note . mconcat) <$> (char '{' *> manyTill block (char '}')))
+  , ("footnote", skipopts *> ((note . mconcat) <$> (char '{' *> manyTill block (char '}'))))
   , ("verb", doverb)
   , ("lstinline", doverb)
   , ("Verb", doverb)

@@ -667,6 +667,12 @@ inlineToMarkdown opts (Span attrs ils) = do
 inlineToMarkdown opts (Emph lst) = do
   contents <- inlineListToMarkdown opts lst
   return $ "*" <> contents <> "*"
+inlineToMarkdown opts (MarginNote lst) = do
+  contents <- inlineListToMarkdown opts lst
+  return $ blankline <> " > " <> contents <> "" <> blankline   
+inlineToMarkdown opts (SideNote lst) = do
+  contents <- inlineListToMarkdown opts lst
+  return $ blankline <> " > " <> contents <> "" <> blankline     
 inlineToMarkdown opts (Strong lst) = do
   contents <- inlineListToMarkdown opts lst
   return $ "**" <> contents <> "**"
