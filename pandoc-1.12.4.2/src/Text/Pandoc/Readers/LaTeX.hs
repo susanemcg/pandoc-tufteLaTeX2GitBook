@@ -400,6 +400,7 @@ inlineCommands = M.fromList $
   , ("marginnote", skipopts *> (marginnote <$> tok))
   , ("sidenote", skipopts *> (sidenote <$> tok))  
   , ("textit", emph <$> tok)
+  , ("textsf", emph <$> tok)
   , ("textsl", emph <$> tok)
   , ("textsc", smallcaps <$> tok)
   , ("sout", strikeout <$> tok)
